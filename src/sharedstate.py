@@ -24,7 +24,7 @@ class SharedState:
     -------
     load_settings(settings: Dict) -> None:
         Updates trading parameters and settings from a given dictionary.
-    load_initial_settings() -> None:
+    load_initial_settings() -> None:z
         Loads initial trading settings from the parameters file.
     refresh_parameters() -> Coroutine:
         Asynchronously refreshes trading parameters from the parameters file at regular intervals.
@@ -54,7 +54,9 @@ class SharedState:
 
         # Initialize market data attributes for Binance and Bybit
         self.binance_ws_connected = False
+
         self.binance_trades = RingBuffer(capacity=1000, dtype=(float, 4))
+        
         self.binance_bba = np.ones((2, 2), dtype=np.float64)
         self.binance_book = OrderBookBinance()
         self.binance_last_price = 0
@@ -96,6 +98,9 @@ class SharedState:
     def _load_initial_settings_(self) -> None:
         """
         Loads initial trading settings from the parameters YAML file.
+        
+        This method reads the parameters YAML file and loads the initial trading settings
+        into the shared state object.
         """
         with open(self.PARAM_PATH, "r") as f:
             settings = yaml.safe_load(f)
@@ -176,8 +181,8 @@ class SharedState:
         float
             The calculated weighted mid-price, factoring in the bid-ask imbalance.
         """
-        imb = bba[0][1] / (bba[0][1] + bba[1][1])
-        return bba[1][0] * imb + bba[0][0] * (1 - imb)
+        imb = bba[0][1] / (bba[0][1] + bba[1][1]) # bidQty / (bidQty + askQty)
+        return bba[1][0] * imb + bba[0][0] * (1 - imb) # askPrice * imb + bidPrice * (1 - imb)
 
     @staticmethod
     def calculate_vamp(book: BaseOrderBook, depth=10) -> float:

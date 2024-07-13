@@ -10,7 +10,9 @@ def trades_imbalance(trades: NDArray, window: int) -> float:
     using geometrically weighted quantities. The imbalance reflects the dominance of buy or sell trades,
     weighted by the recency of trades in the window.
 
-    Steps:
+    Steps
+    -----
+    
     1. Determine the effective window size, the lesser of the specified window or the total trades count.
     2. Generate exponential moving average (EMA) weights for the effective window size, with recent trades
        given higher significance.
@@ -50,8 +52,8 @@ def trades_imbalance(trades: NDArray, window: int) -> float:
     delta_buys, delta_sells = 0.0, 0.0
     
     for i in range(window):
-        trade_side = trades[i, 1]
-        weighted_qty = np.log(1 + trades[i, 3]) * weights[i]
+        trade_side = trades[i, 1] # 0=> buy, 1=> sell
+        weighted_qty = np.log(1 + trades[i, 3]) * weights[i]  # np.log1p(trade_size) * weights[i], here the  recent traders are later in the array and given more weightage
 
         if trade_side == 0.0:
             delta_buys += weighted_qty

@@ -93,6 +93,7 @@ class BybitMarketData:
         async for websocket in websockets.connect(WsStreamLinks.FUTURES_PUBLIC_STREAM):
             print(f"{dt_now()}: Connected to {self.ws_topics} bybit feeds...")
             self.ss.bybit_ws_connected = True
+            print(f"{dt_now()}: WebSocket connection established.")
 
             try:
                 await websocket.send(self.ws_req)

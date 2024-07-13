@@ -8,12 +8,29 @@ from src.sharedstate import SharedState
 class Features:
     """
     WARNING: Some features are disabled for Bybit-only streams    
+    
+    Features:
+    ---------
+    - bybit_mark_wmid_spread        : log_price_difference(bybit_wmid - bybit_mark_price)
+    - binance_bybit_wmid_spread     : log_price_difference(binance_wmid - bybit_wmid)
+    - bybit_bba_imbalance           : bba_imbalance(bybit_bba : (bidQty / (askQty + bidQty) - 0.5)/2)
+    - binance_bba_imbalance         : bba_imbalance(binance_bba : (bidQty / (askQty + bidQty) - 0.5)/2)
+    - bybit_wmid_vamp_spread        : log_price_difference(bybit_vamp - bybit_wmid) # volume weighted mid price
+    - binance_wmid_vamp_spread      : log_price_difference(binance_vamp - binance_wmid) # volume weighted mid price
+    - bybit_orderbook_imbalance     : orderbook_imbalance: bybit : ema  of n levels of depth and finding an imbalance
+    - binance_orderbook_imbalance   : orderbook_imbalance: binance : ema  of n levels of depth and finding an imbalance
+    - bybit_trades_imbalance        : trades_imbalance: bybit : previous n trades, EMA(window) of it, log transform(1+), weights from ema,  and imbalnce of buy vs sell
+    - binance_trades_imbalance      : trades_imbalance: binance : previous n trades, EMA(window) of it, log transform(1+), weights from ema,  and imbalnce of buy vs sell
+    
+    - generate_skew                 : Generates the skew value based on the features above, with custom weights given to the factors
+    
     """
     _orderbook_depths_ = np.array([10, 25, 50, 100, 200, 500], dtype=np.int64)
     _trades_window_ = 1000
 
     def __init__(self, ss: SharedState) -> None:
         self.ss = ss
+    
 
     def bybit_mark_wmid_spread(self) -> float:
         return log_price_difference(
@@ -43,7 +60,7 @@ class Features:
             base=self.ss.bybit_wmid
         )
 
-    def binance_wmid_vamp_spread(self) -> float:
+    def binance_wmid_vamp_spread(self) -> float:    
         return log_price_difference(
             follow=self.ss.binance_vamp, 
             base=self.ss.binance_wmid

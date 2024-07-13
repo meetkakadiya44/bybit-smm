@@ -29,6 +29,14 @@ class OMS:
         self.ss = ss
 
     def segregate_current_orders(self) -> Tuple[List, List]:
+        """
+        Segregates the current orders into two lists based on their side (Buy or Sell).
+
+        Returns:
+            A tuple containing two lists: buys and sells.
+            - buys: A list of buy orders, each represented as [orderId, side, price, qty].
+            - sells: A list of sell orders, each represented as [orderId, side, price, qty].
+        """
         buys, sells = [], []
         for orderId, details in self.ss.current_orders.items():
             if details["side"] == "Buy":
@@ -125,7 +133,10 @@ class OMS:
         # print(f"New orders: {self._orders_within_spread_(new_orders, spread)}")
         current_bids, current_asks = self.segregate_current_orders()
         # print(f"Current orders: {self._orders_within_spread_(current_bids + current_asks, spread)}")
-        return None
+        
+        ##################################################################################
+        # return None
+        ##################################################################################
 
         # Sorting/segregating current & new orders
         current_bids, current_asks = self.segregate_current_orders()
@@ -171,7 +182,7 @@ class OMS:
             await self.amend_orders(current_best_asks, new_best_asks)
 
         # 5th check
-        print("5th check triggered here!")
+        print("5th check triggered here!")  
         amend_batches = []
 
         for current, new in zip(current_outer_bids + current_outer_asks, new_outer_bids + new_outer_asks):

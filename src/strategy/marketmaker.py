@@ -62,7 +62,7 @@ class MarketMaker:
         Tuple[float, float]
             The absolute values of bid and ask skew, ensuring they are positive.
         """
-        skew = self.features.generate_skew()
+        skew = self.features.generate_skew() # positive skew means price to be higher
         skew = nbround(skew, 2) # NOTE: Temporary, prevents heavy OMS use
 
         # Set the initial values
@@ -70,15 +70,18 @@ class MarketMaker:
         ask_skew = nbclip(skew, -1, 0)  
 
         # Adjust for current inventory delta 
-        bid_skew += self.ss.inventory_delta if self.ss.inventory_delta < 0 else 0
-        ask_skew -= self.ss.inventory_delta if self.ss.inventory_delta > 0 else 0
+        # TODO : check if the formulas are correctly written, if neg.Delta is present and skew is positive, don't want to have new asks.
+        bid_skew += self.ss.inventory_delta if self.ss.inventory_delta < 0 else 0 # shouldn't it be bid_skew -= delta if delta < 0 ?
+        ask_skew -= self.ss.inventory_delta if self.ss.inventory_delta > 0 else 0 # this seems fine w.r.t to current approach.
 
         # Clip values if inventory reaches extreme levels
-        bid_skew = bid_skew if self.ss.inventory_delta > -self.ss.inventory_extreme else 1
-        ask_skew = ask_skew if self.ss.inventory_delta < self.ss.inventory_extreme else 1
+        
+        bid_skew = bid_skew if self.ss.inventory_delta > -self.ss.inventory_extreme else 1 # delta too neg. don't want to have new asks
+        # TODO : check if the else case in the below line is -1 ? 
+        ask_skew = ask_skew if self.ss.inventory_delta < self.ss.inventory_extreme else 1 # delta too pos. don't want to have new bids
         
         # Edge case where skew is extreme for no apparent reason (0 delta is rare here)
-        if (bid_skew == 1 or ask_skew == 1) and (self.ss.inventory_delta == 0):
+        if (bid_skew == 1 or ask_skew == 1) and (self.ss.inventory_delta == 0): # TODO :check if the ask_skew ==-1 
             return 0, 0
         
         return nbabs(bid_skew), nbabs(ask_skew)
@@ -147,8 +150,8 @@ class MarketMaker:
         bid_lower = best_bid - (base_range * (1 - bid_skew))
         ask_upper = best_ask + (base_range * (1 - ask_skew))
             
-        bid_prices = nbgeomspace(best_bid, bid_lower, self.max_orders/2) + self.ss.price_offset
-        ask_prices = nbgeomspace(best_ask, ask_upper, self.max_orders/2) + self.ss.price_offset
+        bid_prices = nbgeomspace(best_bid, bid_lower, self.max_orders/2) + self.ss.price_offset # TODO : check if the offset is to be subtracted
+        ask_prices = nbgeomspace(best_ask, ask_upper, self.max_orders/2) + self.ss.price_offset # this seems fine
 
         return bid_prices, ask_prices
 

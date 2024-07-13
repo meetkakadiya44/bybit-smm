@@ -1,4 +1,4 @@
-from pybit.unified_trading import HTTP
+from bybit.unified_trading import HTTP
 from typing import List
 from src.sharedstate import SharedState
 

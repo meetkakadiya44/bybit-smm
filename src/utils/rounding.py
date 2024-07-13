@@ -4,7 +4,7 @@ def round_step(num: float, step: float) -> float:
     """
     Rounds a float to a given step size
     """
-    num = Decimal(str(num))
+    num = Decimal(str(num)) # 75.25, 0.22
     return float(num - num % Decimal(str(step)))
 
 

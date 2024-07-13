@@ -30,6 +30,7 @@ class BaseOrderBook:
         self.asks = np.empty((0, 2), dtype=np.float64)
         self.bids = np.empty((0, 2), dtype=np.float64)
 
+
     def sort_book(self) -> None:
         """
         Sorts the ask orders in ascending order and bid orders in descending order by price.
@@ -58,6 +59,7 @@ class BaseOrderBook:
             # Remove orders with the specified price
             asks_or_bids = asks_or_bids[asks_or_bids[:, 0] != price]
             # Add new or updated order if quantity is greater than zero
+            # this suggests qty 0 means order removed. and also that the qty is the recent state of the order and not the delta.
             if qty > 0:
                 asks_or_bids = np.vstack((asks_or_bids, np.array([price, qty])))
 

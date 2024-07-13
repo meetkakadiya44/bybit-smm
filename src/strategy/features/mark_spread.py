@@ -28,4 +28,5 @@ def log_price_difference(follow: float, base: float) -> float:
     >>> log_price_difference(follow=48980, base=49000)
     -0.04082465866049452
     """
+    #  TODO : Correct possible error here, supossed to be: np.log( follow/ base) * 100
     return np.log(base / follow) * 100

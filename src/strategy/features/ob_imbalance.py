@@ -8,12 +8,33 @@ def orderbook_imbalance(bids: NDArray, asks: NDArray, depths: NDArray) -> float:
     """
     Calculates the geometrically weighted order book imbalance across different price depths.
 
-    This function computes the logarithm of the ratio of total bid size to total ask size within
-    specified depths, applying an exponential moving average (EMA) weighted scheme for aggregation.
+    This function computes the logarithm:
+        of the ratio of total bid size to total ask size 
+            within specified depths, applying an exponential moving average (EMA) weighted scheme for aggregation.
     Depths are expected in basis points and converted internally to decimal form. The function
     assumes the first entry in both bids and asks arrays represents the best (highest) bid and 
     the best (lowest) ask, respectively.
 
+
+
+    Steps
+    -----
+    - get best bid and ask prices
+    - get EMA weights for the number of depths
+    - initialize an empty array to store imbalances
+    - iterate over the depths
+    - calculate the minimum bid and maximum ask prices within the depth
+        - this is bacially filtering the prices within the range of a depth: eg. 10bps => best_bid*(1- 0.001)  will be the price
+    - calculate the number of bids and asks within the depth
+    - calculate the total bid and ask sizes within the depth 
+    - ratio = np.log(total bid/ total ask)
+    - store the ratio in the imbalances array
+    - calculate the weighted imbalance by multiplying the imbalances array with the weights array
+    - return the sum of the weighted imbalances
+        => here the positive imbalance means price prediction in upper side and vice versa
+        
+    
+    
     Parameters
     ----------
     bids : NDArray
